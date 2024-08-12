@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: job
+rahul:
+  queue:
+    broker-url: tcp://localhost:61616
+    password: admin
+    userName: admin
+    amqComponentName: activemq
+    jmsPoolMaxConnection: 100
+    jmsPoolMaxActive: 10
+  external:
+    queues:
+      first-queue: activemq:FirstQueue
+      readTopic: activemq:queue:Consumer.MASH_001.VirtualTopic.Eidiko?selector=Consumer1='true'
+      consumer1: activemq:queue:Consumer.MASH_002.VirtualTopic.Eidiko?selector=Consumer2='true'
+      consumer2: activemq:queue:Consumer.MASH_003.VirtualTopic.Eidiko?selector=Consumer3='true'
+      consumer3: activemq:queue:Consumer.MASH_004.VirtualTopic.Eidiko?selector=Consumer4='true'
+    topic:
+      firstTopic: activemq:topic:VirtualTopic.Eidiko
+camel:
+  component:
+    kafka:
+      brokers: localhost:9092
