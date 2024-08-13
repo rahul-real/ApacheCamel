@@ -16,11 +16,11 @@ public class Queues {
 	
 	private String firstQueue;
 	
-	private String readTopic;
-	
 	private String consumer1;
 	
 	private String consumer2;
 	
 	private String consumer3;
+	
+	private String consumer4;
 }

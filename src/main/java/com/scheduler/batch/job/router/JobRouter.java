@@ -20,30 +20,30 @@ public class JobRouter extends RouteBuilder {
 	public void configure() throws Exception {
 		
 		from(queues.getFirstQueue())
-		.log("Body ${body}")
+		.log("In FirstQueue received a message of Body ${body}")
 		.setHeader("Consumer1", constant("true"))
 		.to(topics.getFirstTopic())
 		.end();
 		
 		
-		from(queues.getReadTopic())
-		.log("Read Message ${body}")
-		.end();
-		
 		from(queues.getConsumer1())
-		.log("Read Message ${body}")
+		.log("In Consumer.MASH_001.VirtualTopic.Eidiko received a message of Body ${body}")
 		.end();
 		
 		from(queues.getConsumer2())
-		.log("Read Message ${body}")
+		.log("In Consumer.MASH_002.VirtualTopic.Eidiko received a message of Body ${body}")
 		.end();
 		
 		from(queues.getConsumer3())
-		.log("Read Message ${body}")
+		.log("In Consumer.MASH_003.VirtualTopic.Eidiko received a message of Body ${body}")
+		.end();
+		
+		from(queues.getConsumer4())
+		.log("In Consumer.MASH_004.VirtualTopic.Eidiko received a message of Body ${body}")
 		.end();
 		
 		from("kafka:first-kafka-topic")
-		.log("Body ${body}")
+		.log("In kafka:first-kafka-topic received a messagae of Body ${body}")
 		.to(queues.getFirstQueue())
 		.end();
 	}
