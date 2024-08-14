@@ -28,6 +28,7 @@ public class JobRouter extends RouteBuilder {
 		
 		from(queues.getConsumer1())
 		.log("In Consumer.MASH_001.VirtualTopic.Eidiko received a message of Body ${body}")
+		.to(queues.getPubQueue())
 		.end();
 		
 		from(queues.getConsumer2())
@@ -46,6 +47,11 @@ public class JobRouter extends RouteBuilder {
 		.log("In kafka:first-kafka-topic received a messagae of Body ${body}")
 		.to(queues.getFirstQueue())
 		.end();
+		
+		from(queues.getPubQueue())
+		.log("In FirstAmqpQueue received a messagae of Body ${body}")
+		.end();
+		
 	}
 
 }

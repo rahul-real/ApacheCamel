@@ -21,5 +21,6 @@ public class StoredProcedures {
 	
 	private String getRegistrationData;
 	
+	private String addEmployeeDetails;
 
 }

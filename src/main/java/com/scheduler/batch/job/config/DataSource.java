@@ -3,9 +3,11 @@ package com.scheduler.batch.job.config;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -31,6 +33,9 @@ public class DataSource {
 	
 	@Value("${spring.datasource.url}")
 	private String url;
+	
+	@Value("${spring.datasource.url2}")
+	private String url2;
 	
 	@Value("${spring.datasource.driverClassName}")
 	private String driverClassName;
@@ -59,8 +64,9 @@ public class DataSource {
 	@Value("${spring.datasource.hikari.minimum-idle}")
 	private int minIdle;
 
-    @Bean
-    public HikariDataSource primaryDataSource(){
+    @Bean("primaryDataSource")
+    @Primary
+    HikariDataSource primaryDataSource(){
 		
 		HikariConfig hikariConfig = new HikariConfig();
 		hikariConfig.setDriverClassName(driverClassName);
@@ -80,10 +86,33 @@ public class DataSource {
 		return hds;
 		
 	}
+    
+    @Bean("secondaryDataSource")
+    HikariDataSource secondaryDataSource(){
+		
+		HikariConfig hikariConfig = new HikariConfig();
+		hikariConfig.setDriverClassName(driverClassName);
+		hikariConfig.setJdbcUrl(url2);
+		hikariConfig.setUsername(username);
+		hikariConfig.setPassword(password);
+		hikariConfig.setMaximumPoolSize(maxpoolSize);
+		hikariConfig.setMinimumIdle(minIdle);
+		hikariConfig.setConnectionTimeout(connectionTimeout);
+		hikariConfig.setPoolName(poolName);
+		hikariConfig.setIdleTimeout(idleTimeout);
+		
+		hikariConfig.addDataSourceProperty("statementPoolingCacheSize", prepStmtCacheSize);
+		hikariConfig.addDataSourceProperty("disableStatementPooling", cachePrepStmt);
+		hikariConfig.addDataSourceProperty("useUnicode", "false");
+		HikariDataSource hds = new HikariDataSource(hikariConfig);
+		return hds;
+		
+	}
 
 
+    @Primary
     @Bean(name = "entityManagerFactory")
-    EntityManagerFactory writeEntityManagerFactory(@Autowired HikariDataSource primaryDataSource) {
+    EntityManagerFactory writeEntityManagerFactory(@Autowired @Qualifier("primaryDataSource") HikariDataSource primaryDataSource) {
     	LocalContainerEntityManagerFactoryBean localContainerEntityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
     	localContainerEntityManagerFactoryBean.setPersistenceUnitName("persistence.writing");
     	localContainerEntityManagerFactoryBean.setDataSource(primaryDataSource);
@@ -95,5 +124,21 @@ public class DataSource {
 		return localContainerEntityManagerFactoryBean.getObject();
     	
     }
+    
+    @Bean(name = "secondaryEntityManagerFactory")
+    EntityManagerFactory secondaryEntityManagerFactory(@Autowired @Qualifier("secondaryDataSource") HikariDataSource secondaryDataSource) {
+    	LocalContainerEntityManagerFactoryBean localContainerEntityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
+    	localContainerEntityManagerFactoryBean.setPersistenceUnitName("persistence.writing");
+    	localContainerEntityManagerFactoryBean.setDataSource(secondaryDataSource);
+    	localContainerEntityManagerFactoryBean.setPackagesToScan("com.rahul.learn");
+    	localContainerEntityManagerFactoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+    	Map<String,Object> jpa = localContainerEntityManagerFactoryBean.getJpaPropertyMap();
+    	jpa.put("hibernate.proc.param_null_passing", true);
+    	localContainerEntityManagerFactoryBean.afterPropertiesSet();
+		return localContainerEntityManagerFactoryBean.getObject();
+    	
+    }
+    
+    
     
 }

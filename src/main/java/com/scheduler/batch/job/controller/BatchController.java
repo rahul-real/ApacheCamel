@@ -1,7 +1,9 @@
 package com.scheduler.batch.job.controller;
 
+import java.util.List;
 import java.util.UUID;
 
+import org.apache.kafka.common.Uuid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,12 +13,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.common.artifacts.dto.PreferenceRequest;
-import com.common.artifacts.dto.PreferenceResponse;
+import com.common.artifact.PreferenceRequest;
+import com.common.artifact.PreferenceResponse;
+import com.scheduler.batch.job.dto.Employee;
 import com.scheduler.batch.job.service.JobService;
 
 import jakarta.validation.Valid;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -54,5 +59,18 @@ public class BatchController {
 		});
 		return Mono.just(respone);
 	}
+	
+	@PostMapping("/add/employee")
+	public Flux<?> addEmployeeDetails(@RequestBody List<Employee> employeesDetails) {
+		
+		String appTxnNum = UUID.randomUUID().toString();
+		
+		log.info("ApplicationTransactionNumber {} API /add/employee got called with Request: {} ",appTxnNum,employeesDetails);
+		
+		jobservice.addEmployeeDetails(appTxnNum,employeesDetails);
+		
+		return Flux.fromIterable(employeesDetails);
+	}
+	
 
-}
+}	

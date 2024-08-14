@@ -1,20 +1,23 @@
 package com.scheduler.batch.job.repo.impl;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.common.artifacts.dto.RegistrationData;
+import com.common.artifact.RegistrationData;
 import com.scheduler.batch.job.config.StoredProcedures;
+import com.scheduler.batch.job.dto.Employee;
 import com.scheduler.batch.job.repo.JobSchedularRepository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.ParameterMode;
 import jakarta.persistence.StoredProcedureQuery;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 @Repository
@@ -22,8 +25,14 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class JobSchedularRepositoryImpl implements JobSchedularRepository {
 	
+	
+	@Qualifier("entityManagerFactory")
 	@Autowired
-	EntityManagerFactory entityManagerFactory;
+	EntityManagerFactory writeEntityManagerFactory;
+	
+	@Qualifier("secondaryEntityManagerFactory")
+	@Autowired
+	EntityManagerFactory secondaryEntityManagerFactory;
 	
 	@Autowired
 	StoredProcedures storedProcedures;
@@ -35,7 +44,7 @@ public class JobSchedularRepositoryImpl implements JobSchedularRepository {
 		StoredProcedureQuery storedProcedureQuery = null;
 		List<RegistrationData> registrationData = null;
 		try {
-			entityManager = entityManagerFactory.createEntityManager();
+			entityManager = writeEntityManagerFactory.createEntityManager();
 			storedProcedureQuery = entityManager.createStoredProcedureQuery(storedProcedures.getGetRegistrationData());
 			storedProcedureQuery.registerStoredProcedureParameter("ParId", String.class, ParameterMode.IN)
 			.setParameter("ParId", parId);
@@ -57,6 +66,37 @@ public class JobSchedularRepositoryImpl implements JobSchedularRepository {
 	private void closeResources(EntityManager entityManager) {
 		if(null!=entityManager) {
 			entityManager.close();
+		}
+	}
+
+	@Override
+	public void addEmployee(String appTxnNum, List<Employee> employeesDetails) {
+		EntityManager entityManager = null;
+		StoredProcedureQuery storedProcedureQuery = null;
+		try {
+			entityManager = secondaryEntityManagerFactory.createEntityManager();
+			for(Employee employee: employeesDetails) {
+				storedProcedureQuery = entityManager.createStoredProcedureQuery(storedProcedures.getAddEmployeeDetails());
+				storedProcedureQuery.registerStoredProcedureParameter("employeeId", BigInteger.class, ParameterMode.IN)
+									.registerStoredProcedureParameter("employeeName", String.class, ParameterMode.IN)
+									.registerStoredProcedureParameter("employeeAddress", String.class, ParameterMode.IN)
+									.registerStoredProcedureParameter("jobTitle", String.class, ParameterMode.IN)
+									.registerStoredProcedureParameter("phoneNumber", BigInteger.class, ParameterMode.IN)
+									.registerStoredProcedureParameter("workLocation", String.class, ParameterMode.IN)
+									.registerStoredProcedureParameter("department", String.class, ParameterMode.IN)
+									.setParameter("employeeId", employee.getEmployeeId())
+									.setParameter("employeeName", employee.getEmployeeName())
+									.setParameter("employeeAddress", employee.getEmployeeAddress())
+									.setParameter("jobTitle", employee.getJobTitle())
+									.setParameter("phoneNumber", employee.getPhoneNumber())
+									.setParameter("workLocation", employee.getWorkLocation())
+									.setParameter("department", employee.getDepartment());
+				storedProcedureQuery.execute();
+			}
+			
+		} catch (Exception e) {
+			log.info("ApplicationTransactionNumber {} Exception while adding Employee Details {} ", appTxnNum,e.getMessage());
+			throw e;
 		}
 	}
 

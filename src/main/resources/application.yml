@@ -3,6 +3,7 @@ spring:
     name: job
   datasource:
     url: jdbc:sqlserver://localhost:1433;encrypt=true;trustServerCertificate=true;databaseName=Rahul
+    url2: jdbc:sqlserver://localhost:1433;encrypt=true;trustServerCertificate=true;databaseName=Eidiko
     username: SQL_Login
     password: Qwerty123
     driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
@@ -23,6 +24,13 @@ rahul:
     amqComponentName: activemq
     jmsPoolMaxConnection: 100
     jmsPoolMaxActive: 10
+  sub:
+    sub-broker-url: amqp://localhost:5672
+    password: admin
+    userName: admin
+    subComponentName: activemqsub
+    jmsPoolMaxConnection: 100
+    jmsPoolMaxActive: 10
   external:
     queues:
       first-queue: activemq:FirstQueue
@@ -30,10 +38,12 @@ rahul:
       consumer2: activemq:queue:Consumer.MASH_002.VirtualTopic.Eidiko?selector=Consumer2='true'
       consumer3: activemq:queue:Consumer.MASH_003.VirtualTopic.Eidiko?selector=Consumer3='true'
       consumer4: activemq:queue:Consumer.MASH_004.VirtualTopic.Eidiko?selector=Consumer4='true'
+      pub-queue: activemqsub:FirstAmqpQueue
     topic:
       firstTopic: activemq:topic:VirtualTopic.Eidiko
   stored-proc-name:
     get-registration-data: dbo.GET_REGISTRATION_DATA
+    add-employee-details: dbo.AddEmployeeDetails
 camel:
   component:
     kafka:

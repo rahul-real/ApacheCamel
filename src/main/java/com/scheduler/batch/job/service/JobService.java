@@ -8,10 +8,11 @@ import org.apache.camel.ProducerTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.common.artifacts.dto.PreferenceRequest;
-import com.common.artifacts.dto.PreferenceResponse;
-import com.common.artifacts.dto.RegistrationData;
+import com.common.artifact.PreferenceRequest;
+import com.common.artifact.PreferenceResponse;
+import com.common.artifact.RegistrationData;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.scheduler.batch.job.dto.Employee;
 import com.scheduler.batch.job.repo.JobSchedularRepository;
 
 @Service
@@ -47,6 +48,12 @@ public class JobService {
 		producerTemplate.sendBody("kafka:first-kafka-topic", json);
 		
 		return response;
+	}
+
+	public void addEmployeeDetails(String appTxnNum, List<Employee> employeesDetails) {
+		
+		jobSchedularRepository.addEmployee(appTxnNum,employeesDetails);
+		
 	}
 	
 	

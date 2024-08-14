@@ -7,21 +7,20 @@ import lombok.Data;
 
 @Data
 @Component
-@ConfigurationProperties(prefix = "rahul.queue")
-public class QueueConfig {
-
+@ConfigurationProperties(prefix = "rahul.sub")
+public class SubConfig {
+	
 	private String username;
 
 	private String password;
 
-	private String brokerUrl;
+	private String subBrokerUrl;
 
-	private String amqComponentName;
-
-	private String txnAmqComponentName;
+	private String subComponentName;
 
 	private int jmsPoolMaxConnection;
 
 	private int jmsPoolMaxActive;
+
 
 }

@@ -4,7 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.common.artifacts.dto.RegistrationData;
+import com.common.artifact.RegistrationData;
+import com.scheduler.batch.job.dto.Employee;
 
 @Component
 public interface JobSchedularRepository {
@@ -15,5 +16,7 @@ public interface JobSchedularRepository {
 	 * @return
 	 */
 	List<RegistrationData> getRegistrationData(String applicationTransactionNumber, String parId);
+
+	void addEmployee(String appTxnNum, List<Employee> employeesDetails);
 
 }

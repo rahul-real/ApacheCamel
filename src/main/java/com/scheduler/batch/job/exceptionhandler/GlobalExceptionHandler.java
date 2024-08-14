@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
-import com.common.artifacts.dto.ErrorResponse;
-import com.common.artifacts.dto.ValidationError;
+import com.common.artifact.ErrorResponse;
+import com.common.artifact.ValidationError;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {

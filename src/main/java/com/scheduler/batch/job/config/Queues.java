@@ -23,4 +23,6 @@ public class Queues {
 	private String consumer3;
 	
 	private String consumer4;
+	
+	private String pubQueue;
 }
