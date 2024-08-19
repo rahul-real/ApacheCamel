@@ -19,4 +19,6 @@ public interface JobSchedularRepository {
 
 	void addEmployee(String appTxnNum, List<Employee> employeesDetails);
 
+	List<Object[]> getEmployeeData();
+
 }

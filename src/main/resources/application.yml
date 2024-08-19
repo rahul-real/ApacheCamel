@@ -16,6 +16,23 @@ spring:
       minimum-idle: 5
     disable-prepared-statements-pool: false
     prepared-statements-cache-size: 250
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: rahul.vodala@gmail.com
+    password: qlaq hisd icda dajl
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+#    imap:
+#      host: imap.gmail.com
+#      port: 993
+#      username: rahul.vodala@gmail.com
+#      password: qlaq hisd icda dajl
+#      protocol: imaps 
 rahul:
   queue:
     broker-url: tcp://localhost:61616
@@ -44,6 +61,7 @@ rahul:
   stored-proc-name:
     get-registration-data: dbo.GET_REGISTRATION_DATA
     add-employee-details: dbo.AddEmployeeDetails
+    employee-details: dbo.Get_Employee_Details
 camel:
   component:
     kafka:

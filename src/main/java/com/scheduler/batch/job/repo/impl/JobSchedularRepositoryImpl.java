@@ -2,6 +2,7 @@ package com.scheduler.batch.job.repo.impl;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,7 +98,29 @@ public class JobSchedularRepositoryImpl implements JobSchedularRepository {
 		} catch (Exception e) {
 			log.info("ApplicationTransactionNumber {} Exception while adding Employee Details {} ", appTxnNum,e.getMessage());
 			throw e;
+		}finally {
+			closeResources(entityManager);
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Object[]> getEmployeeData() {
+		List<Object[]> respone = null;
+		EntityManager entityManager = null;
+		StoredProcedureQuery storedProcedureQuery = null;
+		try {
+			entityManager = secondaryEntityManagerFactory.createEntityManager();
+			storedProcedureQuery = entityManager.createStoredProcedureQuery(storedProcedures.getEmployeeDetails());
+			storedProcedureQuery.execute();
+			respone = storedProcedureQuery.getResultList();
+		}catch (Exception e) {
+			log.info("ApplicationTransactionNumber {} Exception while adding Employee Details {} ",UUID.randomUUID().toString(),e.getMessage());
+			throw e;
+		}finally {
+			closeResources(entityManager);
+		}
+		return respone;
 	}
 
 

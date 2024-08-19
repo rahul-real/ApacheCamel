@@ -3,7 +3,6 @@ package com.scheduler.batch.job.controller;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.kafka.common.Uuid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,8 +17,10 @@ import com.common.artifact.PreferenceResponse;
 import com.scheduler.batch.job.dto.Employee;
 import com.scheduler.batch.job.service.JobService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -38,6 +39,11 @@ public class BatchController {
 		return name;
 	}
 	
+    @Operation(summary = "Preference Register Data", description = "Endpoint to get preference Registration data")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Registered preference data"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data")
+    })
 	@PostMapping("/registration/data")
 	public Mono<PreferenceResponse> registrationData(@Valid @RequestBody PreferenceRequest request) throws Exception{
 		
@@ -72,5 +78,25 @@ public class BatchController {
 		return Flux.fromIterable(employeesDetails);
 	}
 	
+	@GetMapping("/send/mail")
+	public String sendMail() {
+		jobservice.sendMail("rahul.vodala@gmail.com", "Hello", "This is a test email");
+	    return "Email sent successfully";
+	 }	
+	
+    @GetMapping("/read/latestEmail")
+    public String readLatestEmail() {
+    	jobservice.readLatestEmail();
+        return "Latest email read successfully!";
+    }	
+    
+    @GetMapping("/read-latest-email")
+    public String readLatestEmailC() {
+        String host = "imap.example.com";
+        String user = "your-email@example.com";
+        String password = "your-password";
+        
+        return jobservice.readLatestEmail(host, user, password);
+    }
 
 }	
