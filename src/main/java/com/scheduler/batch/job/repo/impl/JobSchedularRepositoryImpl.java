@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class JobSchedularRepositoryImpl implements JobSchedularRepository {
 	
 	
-	@Qualifier("entityManagerFactory")
+	@Qualifier("writeEntityManagerFactory")
 	@Autowired
 	EntityManagerFactory writeEntityManagerFactory;
 	

@@ -1,4 +1,16 @@
 spring:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  h2:
+    console:
+      enabled: true
+      path: /h2-console		
   application:
     name: job
   datasource:
@@ -7,6 +19,10 @@ spring:
     username: SQL_Login
     password: Qwerty123
     driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    h2:
+      url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      username: sa
+      password: 
     hikari:
       pool-name: JOBCP
       connection-timeout: 30000
@@ -55,13 +71,15 @@ rahul:
       consumer2: activemq:queue:Consumer.MASH_002.VirtualTopic.Eidiko?selector=Consumer2='true'
       consumer3: activemq:queue:Consumer.MASH_003.VirtualTopic.Eidiko?selector=Consumer3='true'
       consumer4: activemq:queue:Consumer.MASH_004.VirtualTopic.Eidiko?selector=Consumer4='true'
-      pub-queue: activemqsub:FirstAmqpQueue
+      sub-queue: activemqsub:FirstAmqpQueue
     topic:
       firstTopic: activemq:topic:VirtualTopic.Eidiko
   stored-proc-name:
     get-registration-data: dbo.GET_REGISTRATION_DATA
     add-employee-details: dbo.AddEmployeeDetails
     employee-details: dbo.Get_Employee_Details
+  autostartup:
+    enabled: false 
 camel:
   component:
     kafka:

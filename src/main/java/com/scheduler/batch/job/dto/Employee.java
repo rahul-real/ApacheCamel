@@ -2,11 +2,17 @@ package com.scheduler.batch.job.dto;
 
 import java.math.BigInteger;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Data;
 
+@Entity
 @Data
+@Table(name = "EMPLOYEE")
 public class Employee {
 	
+	@Id
 	private BigInteger employeeId;
 	
 	private String employeeName;
@@ -20,6 +26,8 @@ public class Employee {
 	private String workLocation;
 	
 	private String department;
+	
+	public Employee() {}
 	
 	public Employee(Object[] object) {
 		this.employeeId = BigInteger.valueOf((Long) object[0]);

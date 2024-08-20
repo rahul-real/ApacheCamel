@@ -21,6 +21,7 @@ import com.common.artifact.PreferenceResponse;
 import com.common.artifact.RegistrationData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.scheduler.batch.job.dto.Employee;
+import com.scheduler.batch.job.repo.CustomerRepo;
 import com.scheduler.batch.job.repo.JobSchedularRepository;
 
 import jakarta.mail.BodyPart;
@@ -48,6 +49,9 @@ public class JobService {
 
 	@Autowired
 	private JavaMailSender mailSender;
+	
+	@Autowired
+	CustomerRepo customerRepo;
 
 	public PreferenceResponse getRegistrationData(String appTxnNum, PreferenceRequest request) throws Exception {
 
@@ -213,5 +217,10 @@ public class JobService {
 			}
 		}
 		return result.toString();
+	}
+
+	public void purgeCustomer(long id) {
+		Long idLong = (long) 1;
+		customerRepo.deleteById(idLong);
 	}
 }

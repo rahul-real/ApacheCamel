@@ -24,5 +24,5 @@ public class Queues {
 	
 	private String consumer4;
 	
-	private String pubQueue;
+	private String subQueue;
 }

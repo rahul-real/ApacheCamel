@@ -29,7 +29,7 @@ public class MessageBeanConfiguration {
 	private QueueConfig queueConfig;
 	
 	@Autowired
-	private SubConfig pubConfig;
+	private SubConfig subConfig;
 
 	@PostConstruct
 	public void addCamelContext() throws NumberFormatException, JMSException {
@@ -39,21 +39,21 @@ public class MessageBeanConfiguration {
 		activeMQComponent.setConnectionFactory(pooledConnectionFactory);
 		camelContext.addComponent(queueConfig.getAmqComponentName(), activeMQComponent);
 		
-		ActiveMQComponent pubActiveMQComponent = new ActiveMQComponent();
-		JmsPoolConnectionFactory pubPooledConnectionFactory = pubConnectionFactory();
-		pubActiveMQComponent.setConnectionFactory(pubPooledConnectionFactory);
-		camelContext.addComponent(pubConfig.getSubComponentName(), pubActiveMQComponent);		
+		ActiveMQComponent subActiveMQComponent = new ActiveMQComponent();
+		JmsPoolConnectionFactory subPooledConnectionFactory = subConnectionFactory();
+		subActiveMQComponent.setConnectionFactory(subPooledConnectionFactory);
+		camelContext.addComponent(subConfig.getSubComponentName(), subActiveMQComponent);		
 
 	}
 
-	private JmsPoolConnectionFactory pubConnectionFactory() {
+	private JmsPoolConnectionFactory subConnectionFactory() {
 		
-		JmsConnectionFactory jmsConnectionFactory = new JmsConnectionFactory(pubConfig.getUsername(), 
-				pubConfig.getPassword(), pubConfig.getSubBrokerUrl());
+		JmsConnectionFactory jmsConnectionFactory = new JmsConnectionFactory(subConfig.getUsername(), 
+				subConfig.getPassword(), subConfig.getSubBrokerUrl());
 		JmsPoolConnectionFactory jmsPoolConnectionFactory = new JmsPoolConnectionFactory();
 		jmsPoolConnectionFactory.setConnectionFactory(jmsConnectionFactory);
-		jmsPoolConnectionFactory.setMaxConnections(pubConfig.getJmsPoolMaxConnection());
-		jmsPoolConnectionFactory.setMaxSessionsPerConnection(pubConfig.getJmsPoolMaxActive());
+		jmsPoolConnectionFactory.setMaxConnections(subConfig.getJmsPoolMaxConnection());
+		jmsPoolConnectionFactory.setMaxSessionsPerConnection(subConfig.getJmsPoolMaxActive());
 		return jmsPoolConnectionFactory;
 	}
 
