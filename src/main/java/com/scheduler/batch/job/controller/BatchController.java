@@ -16,6 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.common.artifact.PreferenceRequest;
 import com.common.artifact.PreferenceResponse;
 import com.scheduler.batch.job.dto.Employee;
+import com.scheduler.batch.job.logtime.annotation.LogExecutionTime;
 import com.scheduler.batch.job.service.JobService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,12 +35,14 @@ public class BatchController {
 	@Autowired
 	JobService jobservice;
 	
+	@LogExecutionTime
 	@GetMapping("/ping/{name}")
 	public String ping(@PathVariable String name) {
 		log.info("name"+ name);
 		return name;
 	}
 	
+	@LogExecutionTime
     @Operation(summary = "Preference Register Data", description = "Endpoint to get preference Registration data")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Registered preference data"),
@@ -55,6 +58,7 @@ public class BatchController {
 		return Mono.just(preferenceResponse);
 	}
 	
+	@LogExecutionTime
 	@GetMapping("/webclient")
 	public Mono<?> webClient(){
 		WebClient webClient = WebClient.builder()
@@ -67,6 +71,7 @@ public class BatchController {
 		return Mono.just(respone);
 	}
 	
+	@LogExecutionTime
 	@PostMapping("/add/employee")
 	public Flux<?> addEmployeeDetails(@RequestBody List<Employee> employeesDetails) {
 		
@@ -79,18 +84,21 @@ public class BatchController {
 		return Flux.fromIterable(employeesDetails);
 	}
 	
+	@LogExecutionTime
 	@GetMapping("/send/mail")
 	public String sendMail() {
 		jobservice.sendMail("rahul.vodala@gmail.com", "Hello", "This is a test email");
 	    return "Email sent successfully";
 	 }	
 	
+	@LogExecutionTime
     @GetMapping("/read/latestEmail")
     public String readLatestEmail() {
     	jobservice.readLatestEmail();
         return "Latest email read successfully!";
     }	
     
+	@LogExecutionTime
     @GetMapping("/read-latest-email")
     public String readLatestEmailC() {
         String host = "imap.example.com";
@@ -100,6 +108,7 @@ public class BatchController {
         return jobservice.readLatestEmail(host, user, password);
     }
     
+	@LogExecutionTime
     @DeleteMapping("/remove/customer/{id}")
     public void purgeCustomer(@PathVariable long id) {
     	

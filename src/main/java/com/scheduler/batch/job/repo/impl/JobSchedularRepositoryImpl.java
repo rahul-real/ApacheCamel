@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.common.artifact.RegistrationData;
 import com.scheduler.batch.job.config.StoredProcedures;
 import com.scheduler.batch.job.dto.Employee;
+import com.scheduler.batch.job.logtime.annotation.LogExecutionTime;
 import com.scheduler.batch.job.repo.JobSchedularRepository;
 
 import jakarta.persistence.EntityManager;
@@ -40,6 +41,7 @@ public class JobSchedularRepositoryImpl implements JobSchedularRepository {
 	
 	@SuppressWarnings("unchecked")
 	@Override
+	@LogExecutionTime
 	public List<RegistrationData> getRegistrationData(String applicationTransactionNumber, String parId) {
 		EntityManager entityManager = null;
 		StoredProcedureQuery storedProcedureQuery = null;
@@ -71,6 +73,7 @@ public class JobSchedularRepositoryImpl implements JobSchedularRepository {
 	}
 
 	@Override
+	@LogExecutionTime
 	public void addEmployee(String appTxnNum, List<Employee> employeesDetails) {
 		EntityManager entityManager = null;
 		StoredProcedureQuery storedProcedureQuery = null;
@@ -105,6 +108,7 @@ public class JobSchedularRepositoryImpl implements JobSchedularRepository {
 
 	@SuppressWarnings("unchecked")
 	@Override
+	@LogExecutionTime
 	public List<Object[]> getEmployeeData() {
 		List<Object[]> respone = null;
 		EntityManager entityManager = null;
