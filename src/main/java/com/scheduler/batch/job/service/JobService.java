@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -20,7 +21,10 @@ import com.common.artifact.PreferenceRequest;
 import com.common.artifact.PreferenceResponse;
 import com.common.artifact.RegistrationData;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.scheduler.batch.job.dto.Account;
+import com.scheduler.batch.job.dto.Customer;
 import com.scheduler.batch.job.dto.Employee;
+import com.scheduler.batch.job.repo.AccountRepo;
 import com.scheduler.batch.job.repo.CustomerRepo;
 import com.scheduler.batch.job.repo.JobSchedularRepository;
 
@@ -52,6 +56,9 @@ public class JobService {
 	
 	@Autowired
 	CustomerRepo customerRepo;
+	
+	@Autowired
+	AccountRepo accountRepo;
 
 	public PreferenceResponse getRegistrationData(String appTxnNum, PreferenceRequest request) throws Exception {
 
@@ -222,5 +229,31 @@ public class JobService {
 	public void purgeCustomer(long id) {
 		Long idLong = (long) 1;
 		customerRepo.deleteById(idLong);
+	}
+
+	public void addCustomer(long id, String name) {
+		
+		Customer customer = new Customer();
+		customer.setId(id);
+		customer.setName(name);
+		Account account = new Account();
+		account.setCustomer(customer);
+		account.setId(id);
+		account.setNumber(name);
+		List<Account> accounts = new ArrayList<>();
+		accounts.add(account);
+ 		customer.setAccounts(accounts);
+		customerRepo.save(customer);
+		
+	}
+
+	public void addAccount(long id, String name) {
+		Account account = new Account();
+		account.setNumber(name);
+		Customer customer = new Customer();
+		customer.setId(id);
+		account.setCustomer(customer);
+		accountRepo.save(account);
+		
 	}
 }

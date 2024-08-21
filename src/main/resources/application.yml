@@ -43,6 +43,9 @@ spring:
           auth: true
           starttls:
             enable: true
+  batch:
+    job:
+      enabled: false
 #    imap:
 #      host: imap.gmail.com
 #      port: 993

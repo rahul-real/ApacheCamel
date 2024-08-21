@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -17,6 +18,7 @@ import com.common.artifact.PreferenceRequest;
 import com.common.artifact.PreferenceResponse;
 import com.scheduler.batch.job.dto.Employee;
 import com.scheduler.batch.job.logtime.annotation.LogExecutionTime;
+import com.scheduler.batch.job.scheduler.JobScheduler;
 import com.scheduler.batch.job.service.JobService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,6 +36,9 @@ public class BatchController {
 	
 	@Autowired
 	JobService jobservice;
+	
+	@Autowired
+	JobScheduler jobScheduler;
 	
 	@LogExecutionTime
 	@GetMapping("/ping/{name}")
@@ -109,11 +114,44 @@ public class BatchController {
     }
     
 	@LogExecutionTime
+    @PostMapping("/add/customer")
+    public void addCustomerH2(@RequestParam long id,@RequestParam String name) {
+    	
+    	jobservice.addCustomer(id,name);
+    	
+    }
+	
+	@LogExecutionTime
+    @PostMapping("/add/customer/account")
+    public void addCustomerAccountH2(@RequestParam long id,@RequestParam String name) {
+    	
+    	jobservice.addAccount(id,name);
+    	
+    }
+	
+    
+	@LogExecutionTime
     @DeleteMapping("/remove/customer/{id}")
     public void purgeCustomer(@PathVariable long id) {
     	
     	jobservice.purgeCustomer(id);
     	
     }
+	
+	@LogExecutionTime
+	@GetMapping("/employeeData/h2")
+	public void addEmployeeDatafromSqlServerToH2() {
+		
+		jobScheduler.employeeData();
+		
+	}
+	
+	@LogExecutionTime
+	@GetMapping("/csv")
+	public void csvToDbJob() {
+		
+		jobScheduler.importCsvToDb();
+		
+	}
 
 }	
