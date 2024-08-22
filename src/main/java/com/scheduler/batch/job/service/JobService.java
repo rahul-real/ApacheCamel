@@ -2,16 +2,16 @@ package com.scheduler.batch.job.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 import org.apache.camel.ProducerTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -20,13 +20,17 @@ import org.springframework.stereotype.Service;
 import com.common.artifact.PreferenceRequest;
 import com.common.artifact.PreferenceResponse;
 import com.common.artifact.RegistrationData;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.scheduler.batch.job.config.Queues;
+import com.scheduler.batch.job.config.TransitiveConfig;
 import com.scheduler.batch.job.dto.Account;
 import com.scheduler.batch.job.dto.Customer;
 import com.scheduler.batch.job.dto.Employee;
 import com.scheduler.batch.job.repo.AccountRepo;
 import com.scheduler.batch.job.repo.CustomerRepo;
 import com.scheduler.batch.job.repo.JobSchedularRepository;
+import com.scheduler.batch.job.utils.Constants;
 
 import jakarta.mail.BodyPart;
 import jakarta.mail.Folder;
@@ -38,29 +42,31 @@ import jakarta.mail.Session;
 import jakarta.mail.Store;
 import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMultipart;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
+@AllArgsConstructor
 public class JobService {
 
-	@Autowired
-	ProducerTemplate producerTemplate;
+	private final ProducerTemplate producerTemplate;
 
-	@Autowired
-	JobSchedularRepository jobSchedularRepository;
+	private final JobSchedularRepository jobSchedularRepository;
 
-	@Autowired
-	ObjectMapper mapper;
+	private final ObjectMapper mapper;
 
-	@Autowired
-	private JavaMailSender mailSender;
+	private final JavaMailSender mailSender;
 	
-	@Autowired
-	CustomerRepo customerRepo;
+	private final CustomerRepo customerRepo;
 	
-	@Autowired
-	AccountRepo accountRepo;
+	private final AccountRepo accountRepo;
+	
+	private final TransitiveConfig transitiveConfig;
+	
+	private final Queues queues;
 
-	public PreferenceResponse getRegistrationData(String appTxnNum, PreferenceRequest request) throws Exception {
+	public PreferenceResponse getRegistrationData(String appTxnNum, PreferenceRequest request) throws JsonProcessingException {
 
 		PreferenceResponse response = new PreferenceResponse();
 
@@ -78,7 +84,11 @@ public class JobService {
 
 		String json = mapper.writeValueAsString(response);
 
-		producerTemplate.sendBody("kafka:first-kafka-topic", json);
+		if(transitiveConfig.isKafkaEnabled()) {
+			producerTemplate.sendBody("kafka:first-kafka-topic", json);
+		} else {
+			producerTemplate.sendBody(queues.getFirstQueue(),json);
+		}
 
 		return response;
 	}
@@ -90,11 +100,10 @@ public class JobService {
 	}
 
 	public List<Employee> getEmployeeData() {
-		// TODO Auto-generated method stub
-		List<Employee> employee = new LinkedList<Employee>();
+		List<Employee> employee = new LinkedList<>();
 		List<Object[]> response = jobSchedularRepository.getEmployeeData();
 		if (response != null && !response.isEmpty()) {
-			employee = response.stream().map(Employee::new).collect(Collectors.toList());
+			employee = response.stream().map(Employee::new).toList();
 		}
 
 		return employee;
@@ -115,7 +124,7 @@ public class JobService {
 			Session session = Session.getDefaultInstance(properties);
 
 			// Connect to the mail store
-			Store store = session.getStore("imaps");
+			Store store = session.getStore(Constants.IMAPS);
 			store.connect("imap.gmail.com", "rahul.vodala@gmail.com", "qlaq hisd icda dajl");
 
 			// Open the INBOX folder
@@ -128,12 +137,12 @@ public class JobService {
 				Message latestMessage = inbox.getMessage(messageCount);
 
 				// Display the details of the latest email
-				System.out.println("Subject: " + latestMessage.getSubject());
-				System.out.println("From: " + latestMessage.getFrom()[0]);
-				System.out.println("Sent Date: " + latestMessage.getSentDate());
-				System.out.println("Content: " + latestMessage.getContent().toString());
+				log.info("Subject: " + latestMessage.getSubject());
+				log.info("From: " + latestMessage.getFrom()[0]);
+				log.info("Sent Date: " + latestMessage.getSentDate());
+				log.info("Content: " + latestMessage.getContent().toString());
 			} else {
-				System.out.println("No messages found in the inbox.");
+				log.info("No messages found in the inbox.");
 			}
 
 			// Close the inbox and store
@@ -141,18 +150,25 @@ public class JobService {
 			store.close();
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.info("ApplicationTransactionNumber {} failed to read the latest mail due to {} ",UUID.randomUUID().toString(),e.getMessage());
 		}
 	}
 
-	public String readLatestEmail(String host, String user, String password) {
-		try {
-			String downloadPath = "C:\\Users\\syste\\Downloads\\Docs";
+	public String readLatestEmailV2() {
+		try (InputStream input = getClass().getClassLoader().getResourceAsStream("config.properties")) {
+			if (input == null) {
+				log.info("Sorry, unable to find config.properties");
+				return "";
+			}			
+	            
+			String downloadPath;
 			Properties properties = new Properties();
-			properties.put("mail.store.protocol", "imaps");
+            properties.load(input);
+            downloadPath = properties.getProperty("download.path", "default/path");
+			properties.put("mail.store.protocol", Constants.IMAPS);
 			Session emailSession = Session.getDefaultInstance(properties);
 
-			Store store = emailSession.getStore("imaps");
+			Store store = emailSession.getStore(Constants.IMAPS);
 			store.connect("imap.gmail.com", "rahul.vodala@gmail.com", "qlaq hisd icda dajl");
 
 			Folder inbox = store.getFolder("INBOX");
@@ -171,7 +187,7 @@ public class JobService {
 
 			return "Subject: " + subject + "\nContent: " + content + "\n" + attachmentInfo;
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.info("ApplicationTransactionNumber {} failed to read the latest mail due to {} ",UUID.randomUUID().toString(),e.getMessage());
 			return "Error reading email: " + e.getMessage();
 		}
 	}
@@ -179,8 +195,8 @@ public class JobService {
 	private String downloadAttachments(Message message, String downloadPath) throws IOException, MessagingException {
 		StringBuilder attachmentInfo = new StringBuilder("Attachments:\n");
 
-		if (message.getContent() instanceof Multipart) {
-			Multipart multipart = (Multipart) message.getContent();
+		if (message.getContent() instanceof Multipart multipart) {
+			multipart = (Multipart) message.getContent();
 
 			for (int i = 0; i < multipart.getCount(); i++) {
 				BodyPart bodyPart = multipart.getBodyPart(i);
@@ -219,16 +235,15 @@ public class JobService {
 			} else if (bodyPart.isMimeType("text/html")) {
 				String html = (String) bodyPart.getContent();
 				result.append("\n").append(org.jsoup.Jsoup.parse(html).text());
-			} else if (bodyPart.getContent() instanceof MimeMultipart) {
-				result.append(getTextFromMimeMultipart((MimeMultipart) bodyPart.getContent()));
+			} else if (bodyPart.getContent() instanceof MimeMultipart mimeMultipartContent) {
+				result.append(getTextFromMimeMultipart(mimeMultipartContent));
 			}
 		}
 		return result.toString();
 	}
 
 	public void purgeCustomer(long id) {
-		Long idLong = (long) 1;
-		customerRepo.deleteById(idLong);
+		customerRepo.deleteById(id);
 	}
 
 	public void addCustomer(long id, String name) {

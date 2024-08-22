@@ -91,8 +91,7 @@ public class DataSource {
 		hikariConfig.addDataSourceProperty("statementPoolingCacheSize", prepStmtCacheSize);
 		hikariConfig.addDataSourceProperty("disableStatementPooling", cachePrepStmt);
 		hikariConfig.addDataSourceProperty("useUnicode", "false");
-		HikariDataSource hds = new HikariDataSource(hikariConfig);
-		return hds;
+		return new HikariDataSource(hikariConfig);
 		
 	}
     
@@ -113,8 +112,7 @@ public class DataSource {
 		hikariConfig.addDataSourceProperty("statementPoolingCacheSize", prepStmtCacheSize);
 		hikariConfig.addDataSourceProperty("disableStatementPooling", cachePrepStmt);
 		hikariConfig.addDataSourceProperty("useUnicode", "false");
-		HikariDataSource hds = new HikariDataSource(hikariConfig);
-		return hds;
+		return new HikariDataSource(hikariConfig);
 		
 	}
 

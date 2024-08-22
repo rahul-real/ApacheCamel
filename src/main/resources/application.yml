@@ -82,7 +82,9 @@ rahul:
     add-employee-details: dbo.AddEmployeeDetails
     employee-details: dbo.Get_Employee_Details
   autostartup:
-    enabled: false 
+    enable:
+      queueEnabled: true
+      kafkaEnabled: false
 camel:
   component:
     kafka:

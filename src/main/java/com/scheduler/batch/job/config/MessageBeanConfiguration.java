@@ -3,36 +3,33 @@
  */
 package com.scheduler.batch.job.config;
 
+import java.util.Arrays;
+
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.camel.CamelContext;
 import org.apache.camel.component.activemq.ActiveMQComponent;
 import org.apache.qpid.jms.JmsConnectionFactory;
 import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.jms.JMSException;
+import lombok.AllArgsConstructor;
 
 /**
  * @author rahul
  * @since 08-Aug-2024 2024 11:06:33 am
  */
 @Configuration
+@AllArgsConstructor
 public class MessageBeanConfiguration {
 
-	@Autowired
-	private CamelContext camelContext;
-
-	@Autowired
-	private QueueConfig queueConfig;
-	
-	@Autowired
-	private SubConfig subConfig;
+	private final CamelContext camelContext;
+	private final QueueConfig queueConfig;
+	private final SubConfig subConfig;
 
 	@PostConstruct
-	public void addCamelContext() throws NumberFormatException, JMSException {
+	public void addCamelContext() throws NumberFormatException {
 		
 		ActiveMQComponent activeMQComponent = new ActiveMQComponent();
 		PooledConnectionFactory pooledConnectionFactory = activeMqConnectionFactory();	
@@ -60,6 +57,7 @@ public class MessageBeanConfiguration {
 	private PooledConnectionFactory activeMqConnectionFactory() {
 		ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(queueConfig.getUsername(),queueConfig.getPassword()
 				,queueConfig.getBrokerUrl());
+		connectionFactory.setTrustedPackages(Arrays.asList("com.scheduler.batch.job", "com.scheduler.batch.job.router"));
 		connectionFactory.setUseAsyncSend(false);
 		PooledConnectionFactory pooledConnectionFactory = new PooledConnectionFactory();
 		pooledConnectionFactory.setConnectionFactory(connectionFactory);

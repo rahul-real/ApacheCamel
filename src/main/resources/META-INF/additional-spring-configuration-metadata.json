@@ -1,14 +1,17 @@
-{
-	"properties": [
-		{
-			"name": "spring.datasource.disable-prepared-statements-pool",
-			"type": "java.lang.String",
-			"description": "A description for 'spring.datasource.disable-prepared-statements-pool'"
-		},
-		{
-			"name": "spring.datasource.prepared-statements-cache-size",
-			"type": "java.lang.String",
-			"description": "A description for 'spring.datasource.prepared-statements-cache-size'"
-		}
-	]
-}
+{"properties": [
+  {
+    "name": "spring.datasource.disable-prepared-statements-pool",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.disable-prepared-statements-pool'"
+  },
+  {
+    "name": "spring.datasource.prepared-statements-cache-size",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.prepared-statements-cache-size'"
+  },
+  {
+    "name": "spring.datasource.url2",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.url2'"
+  }
+]}

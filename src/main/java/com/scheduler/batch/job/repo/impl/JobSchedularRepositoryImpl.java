@@ -27,17 +27,17 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class JobSchedularRepositoryImpl implements JobSchedularRepository {
 	
+    private final EntityManagerFactory writeEntityManagerFactory;
+    private final EntityManagerFactory secondaryEntityManagerFactory;
+    private final StoredProcedures storedProcedures;
+    public JobSchedularRepositoryImpl(
+            @Qualifier("writeEntityManagerFactory") EntityManagerFactory writeEntityManagerFactory,
+            @Qualifier("secondaryEntityManagerFactory") EntityManagerFactory secondaryEntityManagerFactory, StoredProcedures storedProcedures) {
+        this.writeEntityManagerFactory = writeEntityManagerFactory;
+        this.secondaryEntityManagerFactory = secondaryEntityManagerFactory;
+		this.storedProcedures = storedProcedures;
+    }	
 	
-	@Qualifier("writeEntityManagerFactory")
-	@Autowired
-	EntityManagerFactory writeEntityManagerFactory;
-	
-	@Qualifier("secondaryEntityManagerFactory")
-	@Autowired
-	EntityManagerFactory secondaryEntityManagerFactory;
-	
-	@Autowired
-	StoredProcedures storedProcedures;
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -54,7 +54,7 @@ public class JobSchedularRepositoryImpl implements JobSchedularRepository {
 			storedProcedureQuery.execute();
 			List<Object[]> object = storedProcedureQuery.getResultList();
 			if(object != null && !object.isEmpty()) {
-				registrationData = object.stream().map(RegistrationData::new).collect(Collectors.toList());
+				registrationData = object.stream().map(RegistrationData::new).toList();
 				
 			}
 		}catch (Exception e) {

@@ -8,10 +8,6 @@ public class CustomerCsvProcessor implements ItemProcessor<CustomersCsv,Customer
 
 	@Override
 	public CustomersCsv process(CustomersCsv csv) throws Exception {
- 		if(csv.getCountry().equals("United States")) {
- 			return csv;
- 		}else {
- 			return null;	
-		}
+		return csv;
 	}
 }

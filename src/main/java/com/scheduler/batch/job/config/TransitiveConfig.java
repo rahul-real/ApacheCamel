@@ -7,9 +7,12 @@ import lombok.Data;
 
 @Data
 @Component
-@ConfigurationProperties(prefix = "rahul.autostartup")
+@ConfigurationProperties(prefix = "rahul.autostartup.enable")
 public class TransitiveConfig {
 
-	private boolean enabled;
+	private boolean queueEnabled;
+	
+	private boolean kafkaEnabled;
+	
 	
 }
