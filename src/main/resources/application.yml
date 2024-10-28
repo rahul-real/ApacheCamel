@@ -35,8 +35,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: rahul.vodala@gmail.com
-    password: qlaq hisd icda dajl
+    username: 99892185456@gmail.com
+    password: 666666
     properties:
       mail:
         smtp:

@@ -44,6 +44,7 @@ public class JobScheduler {
 		}
 	}
 	
+	//cron for india
 	@Scheduled(cron = "0 0 12 * * *", zone = "Asia/Kolkata")
 	public void employeeData() {
 		
